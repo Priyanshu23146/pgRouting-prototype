@@ -53,14 +53,16 @@ Ubantu: sudo apt install libboost-all-dev
 macOS: brew install boost
 windows: choco install boost-msvc-14.3
 
+```
+
 ===
 
 ### Build Instruction
 
-```
-
+```bash
 From the project root (pgRouting-prototypes/):
 
 mkdir build && cd build
 cmake ..
 make
+```
