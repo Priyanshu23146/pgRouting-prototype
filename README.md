@@ -52,7 +52,7 @@ Install Boost:
 - macOS: brew install boost
 - windows: choco install boost-msvc-14.3
 
-===
+---
 
 ### Build Instruction
 
@@ -87,7 +87,7 @@ g++ -std=c++17 -Wall -Wextra matching_prototype.cpp -o matching_prototype -lboos
 g++ -std=c++17 -Wall -Wextra edge_connectivity.cpp -o edge_connectivity_prototype -lboost_graph
 ```
 
-===
+---
 
 ### Running tests
 
@@ -105,11 +105,9 @@ Or run each test binary manually:
 ./edge_connectivity_prototype
 ```
 
-===
+---
 
 ### Sample output
-
----
 
 matching_prototype
 
@@ -140,7 +138,7 @@ At least 2 roads must be removed to disconnect the network.
 
 ```
 
-===
+---
 
 ### pgRouting Integration Notes
 
@@ -155,11 +153,11 @@ Each algorithm follows the standard pgRouting architecture:
 | C++ driver  | Builds graph and executes BGL algorithm                               |
 | BGL call    | Executes core algorithm                                               |
 
-# These prototypes directly use Boost Graph Library functions, ensuring smooth transition into pgRouting with minimal changes.
-
-### Goal
+These prototypes directly use Boost Graph Library functions, ensuring smooth transition into pgRouting with minimal changes.
 
 ---
+
+### Goal
 
 To extend pgRouting with:
 
@@ -174,4 +172,25 @@ These features support:
 - Infrastructure planning
 - Disaster response analysis
 
-===
+---
+
+## Project structure
+
+```bash
+pgrouting-prototypes-priyanshu
+│
+├── .github/workflows/
+│   └── ci.yml
+│
+├── max_cardinality_matching/
+│   ├── max_cardinality_matching_prototype.cpp
+│   └── test_max_cardinality_matching.cpp
+│
+├── edge_connectivity/
+│   ├── edge_connectivity_prototype.cpp
+│   └── test_edge_connectivity.cpp
+│
+├── CMakeLists.txt
+├── run_tests.cmake
+└── README.md
+```
