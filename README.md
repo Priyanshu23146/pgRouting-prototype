@@ -26,16 +26,19 @@ This algorithm finds the largest set of edges such that no two edges share a com
 
 ---
 
-### 2. pgr_edgeConnectivity
+### 2. pgr_biconnected_components
 
-Uses `boost::edge_connectivity()` to compute the minimum number of edges whose removal disconnects the graph.
+Uses `boost::biconnected_components()` and `boost::articulation_points()` to analyze the biconnectivity of the graph.
 
-This measures the robustness of a network.
+Biconnected components are the maximal sets of edges that remain connected after removing any single vertex. Articulation points are vertices whose removal increases the number of connected components.
+
+This algorithm identifies the structural integrity and weak points in transportation networks.
 
 **Use cases:**
 
-- Identifying critical road segments
-- Infrastructure resilience analysis
+- Identifying critical junctions (articulation points)
+- Finding bridge edges
+- Network robustness and vulnerability analysis
 - Disaster planning and evacuation routing
 
 ---
@@ -48,7 +51,7 @@ This measures the robustness of a network.
 
 Install Boost:
 
-- Ubantu: sudo apt install libboost-all-dev
+- Ubuntu: sudo apt install libboost-all-dev
 - macOS: brew install boost
 - windows: choco install boost-msvc-14.3
 
@@ -84,7 +87,7 @@ Standalone compile (without CMake) for one file, from the algorithm directory:
 
 ```bash
 g++ -std=c++17 -Wall -Wextra matching_prototype.cpp -o matching_prototype -lboost_graph
-g++ -std=c++17 -Wall -Wextra edge_connectivity.cpp -o edge_connectivity_prototype -lboost_graph
+g++ -std=c++17 -Wall -Wextra biconnected_components.cpp -o biconnected_components.cpp -lboost_graph
 ```
 
 ---
@@ -102,7 +105,7 @@ Or run each test binary manually:
 
 ```bash
 ./matching_prototype
-./edge_connectivity_prototype
+./biconnected_components_prototype
 ```
 
 ---
@@ -125,33 +128,84 @@ Unmatched vertices = 0
 
 ```
 
-edge_connectivity_prototype
+biconnected_components_prototype
 
 ```bash
-=== Road Network Graph ===
-Vertices V = 5, Edges E = 6
+=== Biconnected Components Demo ===
+Vertices V = 5, Edges E = 5
 
-Edge Connectivity: 2
+=== Graph Edges ===
+0 - 1
+1 - 2
+0 - 3
+1 - 3
+2 - 4
 
-Interpretation:
-At least 2 roads must be removed to disconnect the network.
+Edge component assignments:
+0 - 1 (component=2)
+1 - 2 (component=1)
+0 - 3 (component=2)
+1 - 3 (component=2)
+2 - 4 (component=0)
 
+Articulation points: 1, 2
+Biconnected components count = 3
+```
+
+Actual command used:
+
+```bash
+./biconnected_components_prototype
 ```
 
 ---
 
-### pgRouting Integration Notes
+### Implementation status
+
+- `max_cardinality_matching_prototype.cpp`: implemented and tested in repository.
+- `biconnected_components and articulation_points/biconnected_components and articulation_points.cpp`: placeholder file exists; implementation logic should use `boost::biconnected_components` and `boost::articulation_points`.
+
+---
+
+### How results map to pgRouting functions (SQL signature)
+
+1. pgr_maxCardinalityMatching (postgreSQL wrapper)
+
+- SQL signature (example):
+  `pgr_maxCardinalityMatching(edges_sql_table, start_vid, end_vid, directed := false)`
+- Internals:
+  - SQL wrapper validates inputs and builds edge list
+  - C bridge converts rows to C/C++ graph structure
+  - C++ driver constructs a `boost::adjacency_list` graph
+  - BGL call: `boost::edmonds_maximum_cardinality_matching(g, &mate[0])`
+- Output mapping:
+  - matched pairs returned as set of edge IDs or vertex pairs
+  - matching size returned separately
+
+2. biconnected_components (postgreSQL wrapper)
+
+- SQL signature (example):
+  `pgr_biconnectedComponents(edges_sql_table, start_vid, end_vid, directed := false)`
+- Internals:
+  - SQL wrapper validates inputs and builds edge list
+  - C bridge constructs C++ graph type
+  - C++ driver invokes BGL:
+    - `boost::biconnected_components(g, component)`
+    - `boost::articulation_points(g, art_points)`
+- Output mapping:
+  - each edge annotated with component ID
+  - articulation points returned as vertex list
 
 ---
 
 Each algorithm follows the standard pgRouting architecture:
 
-| Layer       | Role                                                                  |
-| ----------- | --------------------------------------------------------------------- |
-| SQL wrapper | User calls `pgr_maxCardinalityMatching()` or `pgr_edgeConnectivity()` |
-| C bridge    | Handles PostgreSQL input/output and calls C++ driver                  |
-| C++ driver  | Builds graph and executes BGL algorithm                               |
-| BGL call    | Executes core algorithm                                               |
+| Layer       | Role                                                                    |
+| ----------- | ----------------------------------------------------------------------- |
+| SQL wrapper | User calls `pgr_maxCardinalityMatching()` or `biconnected_components()` |
+| C bridge    | Handles PostgreSQL input/output and calls C++ driver                    |
+| C++ driver  | Builds graph and executes BGL algorithm                                 |
+| BGL call    | Executes core algorithm                                                 |
 
 These prototypes directly use Boost Graph Library functions, ensuring smooth transition into pgRouting with minimal changes.
 
@@ -177,18 +231,18 @@ These features support:
 ## Project structure
 
 ```bash
-pgrouting-prototypes-priyanshu
+pgRouting-prototype
 │
-├── .github/workflows/
-│   └── ci.yml
+├── .vscode/
+│   └── c_cpp_properties.json
 │
 ├── max_cardinality_matching/
 │   ├── max_cardinality_matching_prototype.cpp
 │   └── test_max_cardinality_matching.cpp
 │
-├── edge_connectivity/
-│   ├── edge_connectivity_prototype.cpp
-│   └── test_edge_connectivity.cpp
+├── biconnected_components and articulation_points/
+│   ├── biconnected_components_prototype.cpp
+│   └── test_biconnected_components.cpp
 │
 ├── CMakeLists.txt
 ├── run_tests.cmake
