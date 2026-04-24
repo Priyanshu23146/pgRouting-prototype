@@ -239,12 +239,151 @@ pgRouting-prototype
 ├── max_cardinality_matching/
 │   ├── max_cardinality_matching_prototype.cpp
 │   └── test_max_cardinality_matching.cpp
+│   └── CMakeLists.txt
 │
 ├── biconnected_components and articulation_points/
-│   ├── biconnected_components_prototype.cpp
+│   ├── biconnected_components and articulation_points.cpp
 │   └── test_biconnected_components.cpp
+│   └── CMakeLists.txt
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 │
 ├── CMakeLists.txt
 ├── run_tests.cmake
+├── graph_utils.hpp
+├── performance_benchmark.cpp
+├── transportation_example.cpp
+├── Dockerfile
+├── .gitignore
 └── README.md
 ```
+
+---
+
+## Additional Files and Enhancements
+
+This project has been enhanced with additional files that transform it from a basic prototype into a professional, maintainable, and scalable codebase. Below is a detailed breakdown of the additional files created:
+
+### 1. Build System Files (3 files)
+
+**CMakeLists.txt** - Root CMake configuration with Boost dependency detection
+
+- Configures the entire project build system
+- Automatically detects and links Boost Graph Library
+- Sets up cross-platform compilation with C++17 standard
+- Defines custom targets for building prototypes and tests
+
+**max_cardinality_matching/CMakeLists.txt** - Subdirectory build configuration
+
+- Configures building of max cardinality matching prototype and tests
+- Links appropriate Boost libraries
+- Registers unit tests with CTest framework
+
+**biconnected_components and articulation_points/CMakeLists.txt** - Subdirectory build configuration
+
+- Configures building of biconnected components prototype and tests
+- Handles the special filename with spaces
+- Links appropriate Boost libraries
+- Registers unit tests with CTest framework
+
+**run_tests.cmake** - Custom test runner script
+
+- Provides detailed test output beyond standard CTest
+- Shows individual test results with PASS/FAIL status
+- Displays test output for debugging failed tests
+- Can be run independently: `cmake -P run_tests.cmake`
+
+### 2. CI/CD Pipeline (1 file)
+
+**.github/workflows/ci.yml** - GitHub Actions workflow for automated building and testing on Ubuntu
+
+- Triggers on pushes and pull requests to main/develop branches
+- Installs all required dependencies (build tools, CMake, Boost)
+- Configures and builds the project using CMake
+- Runs automated tests using both CTest and custom test runner
+- Provides continuous integration for code quality assurance
+
+### 3. Performance Analysis (1 file)
+
+**performance_benchmark.cpp** - Benchmarking utility for measuring algorithm performance
+
+- Generates random graphs of varying sizes and densities
+- Measures execution time for max cardinality matching algorithm
+- Tests performance across different graph characteristics:
+  - Small sparse graphs (10 vertices, 30% density)
+  - Small dense graphs (10 vertices, 80% density)
+  - Medium graphs (50 vertices, various densities)
+  - Large graphs (100 vertices, various densities)
+- Outputs detailed performance metrics in tabular format
+
+### 4. Common Utilities (1 file)
+
+**graph_utils.hpp** - Shared header with common graph operations, validation functions, and statistics
+
+- `print_graph()` - Displays graph edges in readable format
+- `get_graph_stats()` - Returns comprehensive graph statistics (vertices, edges, density, connectivity)
+- `print_graph_stats()` - Displays formatted graph statistics
+- `validate_matching()` - Verifies matching results for correctness
+- Provides reusable components across different algorithms
+
+### 5. Containerization (1 file)
+
+**Dockerfile** - Docker container for easy development environment setup
+
+- Based on Ubuntu 20.04 with all development tools pre-installed
+- Includes build-essential, CMake, and Boost libraries
+- Automatically builds the project on container creation
+- Enables consistent development environment across different machines
+- Simplifies onboarding for new contributors
+
+### 6. Version Control (1 file)
+
+**.gitignore** - Excludes build artifacts, executables, and temporary files
+
+- Ignores build directories (`build/`, `cmake-build-*/`)
+- Excludes compiled executables (`*.exe`, `*.out`)
+- Filters IDE-specific files (`.vscode/settings.json`, `.idea/`)
+- Removes OS-generated files (`.DS_Store`, `Thumbs.db`)
+- Prevents temporary files from being committed
+
+### 7. Real-World Examples (1 file)
+
+**transportation_example.cpp** - Practical demonstrations of algorithms in transportation contexts
+
+**Ride-Sharing Matching Example:**
+
+- Models 8 riders and 8 drivers as a bipartite graph
+- Demonstrates maximum cardinality matching for optimal pairings
+- Shows real-world application of matching algorithms
+- Displays assignment results and unmatched participants
+
+**Network Vulnerability Analysis Example:**
+
+- Creates a road network graph with potential weak points
+- Analyzes biconnected components to identify network structure
+- Finds articulation points (critical junctions)
+- Demonstrates transportation network robustness analysis
+
+## Benefits of These Additions
+
+✅ **Automated Building**: CMake system enables cross-platform builds with dependency management  
+✅ **Continuous Integration**: GitHub Actions provides automated testing and quality assurance  
+✅ **Performance Monitoring**: Benchmarking tools track algorithm efficiency and scalability  
+✅ **Code Reusability**: Common utilities reduce code duplication and improve maintainability  
+✅ **Easy Setup**: Docker container provides consistent development environment  
+✅ **Clean Repository**: Proper .gitignore keeps the repository organized and focused  
+✅ **Real-World Relevance**: Practical examples demonstrate transportation applications  
+✅ **Professional Standards**: Follows industry best practices for C++ project structure
+
+## File Count Summary
+
+**Total Files Now: 17 files** (increased from 9 essential files)
+
+- **Essential prototype files**: 6 (algorithm implementations and tests)
+- **Build/CI infrastructure**: 5 (CMake files, CI workflow, custom test runner)
+- **Performance & utilities**: 3 (benchmarking, common utilities, Docker)
+- **Examples & documentation**: 3 (real-world examples, enhanced README, version control)
+
+These enhancements transform the prototype from a basic demonstration into a professional, maintainable, and scalable project ready for integration into pgRouting's main codebase.
